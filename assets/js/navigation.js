@@ -106,10 +106,24 @@ function categoriesPage(){
     arrowBtn.classList.remove("header-arrow--white");
     headerTitle.classList.add("inactive");
     headerCategoryTitle.classList.remove("inactive");
-    searchForm.classList.remove("inactive");
+    headerCategoryTitle.innerHTML = "";
+    headerCategoryTitle.innerHTML = decodeURI(location.hash.split("-")[1]);
+    searchForm.classList.add("inactive");
 
     trendingPreviewSection.classList.add("inactive");
     categoriesPreviewSection.classList.add("inactive");
     genericSection.classList.remove("inactive");
     movieDetailSection.classList.add("inactive");
+
+    let idCategory = location.hash.split("-")[0].split("=")[1];
+    getMoviesByCategory(idCategory);
+    smoothscroll();
 }
+
+function smoothscroll(){
+    const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    if (currentScroll > 0) {
+         window.requestAnimationFrame(smoothscroll);
+         window.scrollTo (0,currentScroll - (currentScroll/5));
+    }
+};

@@ -11,11 +11,36 @@ const api = axios.create({
 
 async function getTrendingMoviesPreview(){
     const {data} = await api("/trending/movies/day");
-   
-    const movies = data.results;
     
-    //const trendingMoviesPreviewList = document.querySelector("#trendingPreview .trendingPreview-movieList");
-    trendingMoviesPreviewList.innerHTML = "";
+    drawMovies(data.results,trendingMoviesPreviewList);
+}
+
+async function getMoviesByCategory(id){
+    const {data} = await api("/discover/movie", {
+        params: {
+            with_genres: id
+        }
+    });
+
+    drawMovies(data.results, genericSection); 
+}
+
+
+async function getListCategories(){
+    const { data } = await api("/genre/movie/list", {
+        params: {
+            "language" : "es"
+        }
+    });
+  
+    drawCategories(data.genres,categoriesPreviewList);
+}
+
+
+
+function drawMovies(movies, container){
+
+    container.innerHTML = "";
     
     movies.forEach(movie => {
         const movieContainer = document.createElement("div");
@@ -27,21 +52,12 @@ async function getTrendingMoviesPreview(){
         movieImg.setAttribute("alt", movie.title);
         
         movieContainer.appendChild(movieImg);
-        trendingMoviesPreviewList.appendChild(movieContainer);
+        container.appendChild(movieContainer);
     });
 }
 
-async function getListCategories(){
-    const { data } = await api("/genre/movie/list", {
-        params: {
-            "language" : "es"
-        }
-    });
-  
-    const categories = data.genres;
-
-    //const categoriesContainerPreview = document.querySelector("#categoriesPreview .categoriesPreview-list");
-    categoriesPreviewList.innerHTML = "";
+function drawCategories(categories, container){
+    container.innerHTML = "";
 
     categories.forEach(category => {
         const categoryContainer = document.createElement("div");
@@ -51,10 +67,12 @@ async function getListCategories(){
         categoryTitle.classList.add("category-title");
         const textTitle = document.createTextNode(category.name);
         categoryTitle.setAttribute("id", "id" + category.id);
-        
+        categoryTitle.addEventListener("click", () => {
+            location.hash = `#category=${category.id}-${category.name}`;
+        });
         categoryTitle.appendChild(textTitle);
         categoryContainer.appendChild(categoryTitle);
-        categoriesPreviewList.appendChild(categoryContainer);
+        container.appendChild(categoryContainer);
 
     })
 }
