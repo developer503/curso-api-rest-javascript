@@ -15,6 +15,12 @@ async function getTrendingMoviesPreview(){
     drawMovies(data.results,trendingMoviesPreviewList);
 }
 
+async function getTrendingMovies(){
+    const {data} = await api("/trending/movies/day");
+    
+    drawMovies(data.results,genericSection);
+}
+
 async function getMoviesByCategory(id){
     const {data} = await api("/discover/movie", {
         params: {
@@ -24,7 +30,6 @@ async function getMoviesByCategory(id){
 
     drawMovies(data.results, genericSection); 
 }
-
 
 async function getListCategories(){
     const { data } = await api("/genre/movie/list", {
@@ -36,7 +41,48 @@ async function getListCategories(){
     drawCategories(data.genres,categoriesPreviewList);
 }
 
+async function searchMovies(key){
+    const { data } = await api("/search/movie", {
+        params: {
+            language : "es",
+            query: key
+        }
+    });
 
+    drawMovies(data.results, genericSection); 
+}
+
+async function getDetailMovie(id){
+    const { data } = await api("/movie/" + id, {
+        params: {
+            language : "es"
+        }
+    });
+
+    const urlImageBackground = "https://image.tmdb.org/t/p/w300" + data.poster_path;
+    headerSection.style.background = `
+        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 19.27%, rgba(0, 0, 0, 0) 29.17%),
+        url(${urlImageBackground})`;
+
+    movieDetailTitle.textContent = data.title;
+    movieDetailDescription.textContent = data.overview;
+    movieDetailScore.textContent = data.vote_average;
+
+   
+    drawCategories(data.genres,movieDetailCategoriesList);
+    getSimilarMovies(data.id);
+    console.log(data);
+}
+
+async function getSimilarMovies(id){
+    const { data } = await api(`/movie/${id}/similar`, {
+        params: {
+            language : "es"
+        }
+    });
+
+    drawMovies(data.results, relatedMoviesContainer);
+}
 
 function drawMovies(movies, container){
 
@@ -46,11 +92,15 @@ function drawMovies(movies, container){
         const movieContainer = document.createElement("div");
         movieContainer.classList.add("movie-container");
 
+        movieContainer.addEventListener("click", () => {
+            location.hash = "#movie=" + movie.id;
+        });
+
         const movieImg = document.createElement("img");
         movieImg.classList.add("movie-img");
         movieImg.setAttribute("src","https://image.tmdb.org/t/p/w300" + movie.poster_path);
         movieImg.setAttribute("alt", movie.title);
-        
+
         movieContainer.appendChild(movieImg);
         container.appendChild(movieContainer);
     });
@@ -76,3 +126,4 @@ function drawCategories(categories, container){
 
     })
 }
+
