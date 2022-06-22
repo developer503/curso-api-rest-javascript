@@ -82,6 +82,7 @@ async function getSimilarMovies(id){
     });
 
     drawMovies(data.results, relatedMoviesContainer);
+    relatedMoviesContainer.scrollTo(0, 0);
 }
 
 function drawMovies(movies, container){
