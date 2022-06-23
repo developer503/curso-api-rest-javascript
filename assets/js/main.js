@@ -71,7 +71,6 @@ async function getDetailMovie(id){
    
     drawCategories(data.genres,movieDetailCategoriesList);
     getSimilarMovies(data.id);
-    console.log(data);
 }
 
 async function getSimilarMovies(id){
