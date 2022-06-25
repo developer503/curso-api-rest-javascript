@@ -9,10 +9,23 @@ const api = axios.create({
     }
 });
 
+/*Utils */
+
+const lazyLoader = new IntersectionObserver((entries) => {
+    
+    entries.forEach((entry) => {
+       
+        if (entry.isIntersecting){
+            const urlImage = entry.target.getAttribute("data-img");
+            entry.target.setAttribute("src", urlImage);
+        }
+    })
+});
+
 async function getTrendingMoviesPreview(){
     const {data} = await api("/trending/movies/day");
     
-    drawMovies(data.results,trendingMoviesPreviewList);
+    drawMovies(data.results,trendingMoviesPreviewList,true);
 }
 
 async function getTrendingMovies(){
@@ -84,7 +97,7 @@ async function getSimilarMovies(id){
     relatedMoviesContainer.scrollTo(0, 0);
 }
 
-function drawMovies(movies, container){
+function drawMovies(movies, container, lazyLoad = false){
 
     container.innerHTML = "";
     
@@ -98,8 +111,14 @@ function drawMovies(movies, container){
 
         const movieImg = document.createElement("img");
         movieImg.classList.add("movie-img");
-        movieImg.setAttribute("src","https://image.tmdb.org/t/p/w300" + movie.poster_path);
+
+        movieImg.setAttribute(lazyLoad ? "data-img" : "src","https://image.tmdb.org/t/p/w300" + movie.poster_path);
         movieImg.setAttribute("alt", movie.title);
+
+        if (lazyLoad){
+            lazyLoader.observe(movieImg);
+        }
+        
 
         movieContainer.appendChild(movieImg);
         container.appendChild(movieContainer);
