@@ -14,7 +14,7 @@ const api = axios.create({
 const lazyLoader = new IntersectionObserver((entries) => {
     
     entries.forEach((entry) => {
-       
+      
         if (entry.isIntersecting){
             const urlImage = entry.target.getAttribute("data-img");
             entry.target.setAttribute("src", urlImage);
@@ -25,15 +25,48 @@ const lazyLoader = new IntersectionObserver((entries) => {
 async function getTrendingMoviesPreview(){
     const {data} = await api("/trending/movies/day");
     
-    drawMovies(data.results,trendingMoviesPreviewList,true);
+    drawMovies(data.results, trendingMoviesPreviewList, true);
 }
 
 async function getTrendingMovies(){
     const {data} = await api("/trending/movies/day");
-    
-    drawMovies(data.results,genericSection);
+    console.log("Cargar inicial")
+    drawMovies(data.results,genericSection, { lazyLoad: true, clear:true});
+
+    /*
+    const btnLoadMore = document.createElement('button');
+    btnLoadMore.innerText = 'Cargar más';
+    btnLoadMore.addEventListener('click', getAllTradingMovies);
+    genericSection.appendChild(btnLoadMore);    */
 }
 
+async function getPaginationTradingMovies(){
+    
+    const { scrollTop, scrollHeight, clientHeight} = document.documentElement;
+
+    const scrollIsEnd = (scrollTop + clientHeight) >= (scrollHeight - 15);
+    
+
+    if (scrollIsEnd){
+        console.log("Paginado")
+        page++;
+        const {data} = await api("/trending/movies/day",
+        {
+            params: {
+                page: page
+            }
+        });
+        
+        drawMovies(data.results,genericSection, { lazyLoad: true, clear:false});
+    }
+   
+/*
+    const btnLoadMore = document.createElement('button');
+    btnLoadMore.innerText = 'Cargar más';
+    btnLoadMore.addEventListener('click', getAllTradingMovies);
+    genericSection.appendChild(btnLoadMore);    */
+
+}
 async function getMoviesByCategory(id){
     const {data} = await api("/discover/movie", {
         params: {
@@ -62,7 +95,7 @@ async function searchMovies(key){
         }
     });
 
-    drawMovies(data.results, genericSection); 
+    drawMovies(data.results, genericSection, true); 
 }
 
 async function getDetailMovie(id){
@@ -97,9 +130,9 @@ async function getSimilarMovies(id){
     relatedMoviesContainer.scrollTo(0, 0);
 }
 
-function drawMovies(movies, container, lazyLoad = false){
+function drawMovies(movies, container, { lazyLoad = false, clear = true }){
 
-    container.innerHTML = "";
+    if (clear) container.innerHTML = "";
     
     movies.forEach(movie => {
         const movieContainer = document.createElement("div");
@@ -115,11 +148,17 @@ function drawMovies(movies, container, lazyLoad = false){
         movieImg.setAttribute(lazyLoad ? "data-img" : "src","https://image.tmdb.org/t/p/w300" + movie.poster_path);
         movieImg.setAttribute("alt", movie.title);
 
+        movieImg.addEventListener('error', () => {
+            movieImg.setAttribute(
+              'src',
+              'https://static.platzi.com/static/images/error/img404.png',
+            );
+          })
+
         if (lazyLoad){
             lazyLoader.observe(movieImg);
         }
         
-
         movieContainer.appendChild(movieImg);
         container.appendChild(movieContainer);
     });
