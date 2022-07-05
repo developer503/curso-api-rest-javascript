@@ -1,3 +1,4 @@
+let maxPage;
 let page = 1;
 let infiniteScroll;
 
@@ -102,6 +103,9 @@ function searchPage(){
 
     let key = location.hash.split("=")[1];
     searchMovies(key);
+    infiniteScroll = getPaginationMoviesBySearch(key);
+
+    
 }
 
 function moviePage(){
@@ -142,6 +146,7 @@ function categoriesPage(){
 
     let idCategory = location.hash.split("-")[0].split("=")[1];
     getMoviesByCategory(idCategory);
+    infiniteScroll = getPaginationMoviesByCategory(idCategory);
     smoothscroll();
 }
 
