@@ -103,11 +103,36 @@ button {
 
 .movie-container {
   cursor: pointer;
+  position: relative;
 }
 
 .movie-img {
   border-radius: 8px;
   min-height: 175px;
+}
+
+.movie-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  height: 30px;
+  width: 30px;
+  border-radius: 30px;
+  padding: 0;
+}
+
+.movie-btn::before{
+  content: "🤍";
+  font-size: 13px;
+}
+
+.movie-btn--liked {
+  background-color: var(--purple-light-2);
+  box-shadow: 0px 0px 10px 2px var(--purple-dark-1);
+}
+
+.movie-btn--liked::before {
+  content: "💜";
 }
 
 .categoriesPreview-list, .categories-list {
