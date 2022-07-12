@@ -5,7 +5,10 @@ let infiniteScroll;
 window.addEventListener("load", navigator, false);
 window.addEventListener("hashchange", navigator, false);
 window.addEventListener("scroll", infiniteScroll, false);
-
+window.addEventListener('storage', () => { 
+    console.log("cambio");
+    console.log(JSON.parse(window.localStorage.getItem('liked_movies')));
+});
 searchFormBtn.addEventListener("click", () => {
     location.hash = "#search=" + decodeURI(searchFormInput.value);
 });
@@ -58,9 +61,11 @@ function homePage() {
     categoriesPreviewSection.classList.remove("inactive");
     genericSection.classList.add("inactive");
     movieDetailSection.classList.add("inactive");
-    
+    likedSection.classList.remove("inactive");
+
     getTrendingMoviesPreview();
     getListCategories();
+    drawLikedMovies();
 }
 
 function trendsPage(){
@@ -79,7 +84,7 @@ function trendsPage(){
     categoriesPreviewSection.classList.add("inactive");
     genericSection.classList.remove("inactive");
     movieDetailSection.classList.add("inactive");
-
+    likedSection.classList.add("inactive");
     getTrendingMovies();
 
     infiniteScroll = getPaginationTradingMovies;
@@ -100,6 +105,7 @@ function searchPage(){
     categoriesPreviewSection.classList.add("inactive");
     genericSection.classList.remove("inactive");
     movieDetailSection.classList.add("inactive");
+    likedSection.classList.add("inactive");
 
     let key = location.hash.split("=")[1];
     searchMovies(key);
@@ -122,6 +128,7 @@ function moviePage(){
     categoriesPreviewSection.classList.add("inactive");
     genericSection.classList.add("inactive");
     movieDetailSection.classList.remove("inactive");
+    likedSection.classList.add("inactive");
 
     let movie_id = location.hash.split("=")[1];
     getDetailMovie(movie_id);
@@ -143,6 +150,7 @@ function categoriesPage(){
     categoriesPreviewSection.classList.add("inactive");
     genericSection.classList.remove("inactive");
     movieDetailSection.classList.add("inactive");
+    likedSection.classList.add("inactive");
 
     let idCategory = location.hash.split("-")[0].split("=")[1];
     getMoviesByCategory(idCategory);

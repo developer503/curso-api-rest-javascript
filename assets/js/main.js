@@ -175,7 +175,24 @@ async function getSimilarMovies(id){
 }
 
 function likeMovie(movie){
-    
+    const likedMovies = likedMovieList();
+    if (likedMovies[movie.id]){
+        likedMovies[movie.id] = undefined;
+    } else {
+        likedMovies[movie.id] = movie;
+    }
+    localStorage.setItem("liked_movies", JSON.stringify(likedMovies));
+}
+
+function likedMovieList(){
+    const item = JSON.parse(localStorage.getItem("liked_movies"));
+    let movies;
+    if (item){
+        movies = item;
+    } else {
+        movies = {}
+    }
+    return movies;
 }
 
 function drawMovies(movies, container, { lazyLoad = false, clear = true }){
@@ -207,9 +224,11 @@ function drawMovies(movies, container, { lazyLoad = false, clear = true }){
         movieBtn.classList.add("movie-btn");
         
         movieContainer.appendChild(movieBtn);
+        likedMovieList()[movie.id] && movieBtn.classList.add("movie-btn--liked");
         movieBtn.addEventListener("click", () => {
-        movieBtn.classList.toggle("movie-btn--liked");
-            likeMovie(movie);
+            movieBtn.classList.toggle("movie-btn--liked");
+             likeMovie(movie);
+             drawLikedMovies();
         })
 
         if (lazyLoad){
@@ -240,5 +259,11 @@ function drawCategories(categories, container){
         container.appendChild(categoryContainer);
 
     })
+}
+
+function drawLikedMovies(){
+    const likedMovies = likedMovieList();
+    const moviesArray = Object.values(likedMovies);
+    drawMovies(moviesArray,likedMoviesListArticle, { lazyLoad: true, clear: true});
 }
 
